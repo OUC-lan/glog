@@ -637,6 +637,9 @@ static void GetFiles(const string& pattern, vector<string>* files) {
   } while (FindNextFileA(handle, &data));
   BOOL result = FindClose(handle);
   LOG_SYSRESULT(result);
+#elif defined(ANDROID)
+// So far, Android NDK libc does not have glob function.
+# warning "This is a temporal workaround for compilation issue."
 #else
 # error There is no way to do glob.
 #endif

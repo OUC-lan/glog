@@ -48,12 +48,16 @@ include (DetermineGflagsNamespace)
 set (CMAKE_THREAD_PREFER_PTHREAD 1)
 
 if (WITH_GFLAGS)
-  find_package (gflags)
+  find_package(GFlags)
 
-  if (gflags_FOUND)
+  if (GFLAGS_FOUND)
     set (HAVE_LIB_GFLAGS 1)
-    determine_gflags_namespace (gflags_NAMESPACE)
-  endif (gflags_FOUND)
+    if (ANDROID)
+      set(gflags_NAMESPACE gflags)
+    else (ANDROID)
+      determine_gflags_namespace (gflags_NAMESPACE)
+    endif (ANDROID)
+  endif (GFLAGS_FOUND)
 endif (WITH_GFLAGS)
 
 if (WITH_THREADS)
@@ -389,15 +393,15 @@ if (HAVE_NO_UNNAMED_TYPE_TEMPLATE_ARGS)
   target_compile_options (glog PUBLIC -Wno-unnamed-type-template-args)
 endif (HAVE_NO_UNNAMED_TYPE_TEMPLATE_ARGS)
 
-if (gflags_FOUND)
-  target_include_directories (glog PUBLIC ${gflags_INCLUDE_DIR})
-  target_link_libraries (glog PUBLIC ${gflags_LIBRARIES})
+if (GFLAGS_FOUND)
+  target_include_directories (glog PUBLIC ${GFLAGS_INCLUDE_DIR})
+  target_link_libraries (glog PUBLIC ${GFLAGS_LIBRARIES})
 
   if (NOT BUILD_SHARED_LIBS)
     # Don't use __declspec(dllexport|dllimport) if this is a static build
     targeT_compile_definitions (glog PUBLIC GFLAGS_DLL_DECLARE_FLAG= GFLAGS_DLL_DEFINE_FLAG=)
   endif (NOT BUILD_SHARED_LIBS)
-endif (gflags_FOUND)
+endif (GFLAGS_FOUND)
 
 set_target_properties (glog PROPERTIES VERSION ${GLOG_MAJOR_VERSION})
 set_target_properties (glog PROPERTIES SOVERSION ${GLOG_VERSION})
@@ -556,14 +560,14 @@ install (TARGETS glog
 set (glog_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set (glog_PACKAGE_DEPS)
 
-if (gflags_FOUND)
+if (GFLAGS_FOUND)
   set (glog_PACKAGE_DEPS
 "
 include (CMakeFindDependencyMacro)
 
 find_dependency (gflags ${gflags_VERSION})
 ")
-endif (gflags_FOUND)
+endif (GFLAGS_FOUND)
 
 configure_package_config_file (glog-config.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/glog-config.cmake INSTALL_DESTINATION
